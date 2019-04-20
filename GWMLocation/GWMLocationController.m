@@ -31,6 +31,8 @@ NSString * const GWMLocationControllerCurrentHeading = @"GWMLocationControllerCu
 NSString * const GWMLocationControllerAuthorizationStatus = @"GWMLocationControllerAuthorizationStatus";
 NSString * const GWMLocationControllerError = @"GWMLocationControllerError";
 
+NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
+
 @interface GWMLocationController ()
 
 @property (nonatomic, strong) CLLocation *_Nullable location;
@@ -167,6 +169,7 @@ NSString * const GWMLocationControllerError = @"GWMLocationControllerError";
 
 -(void)singleLocationWithCompletion:(GWMSingleLocationCompletionBlock)completionHandler
 {
+    self.multipleLocationsCompletion = nil;
     self.singleLocationCompletion = completionHandler;
     
     [self startStandardLocationUpdates];
@@ -174,6 +177,7 @@ NSString * const GWMLocationControllerError = @"GWMLocationControllerError";
 
 -(void)multipleLocationsWithCompletion:(GWMMultipleLocationsCompletionBlock)completionHandler
 {
+    self.singleLocationCompletion = nil;
     self.multipleLocationsCompletion = completionHandler;
     
     [self startStandardLocationUpdates];
@@ -183,7 +187,7 @@ NSString * const GWMLocationControllerError = @"GWMLocationControllerError";
 
 -(BOOL)locationPassesTest:(CLLocation *)location
 {
-    if (location.timestamp.timeIntervalSinceNow > 5.0)
+    if (location.timestamp.timeIntervalSinceNow > kGWMMaximumUsableLocationAge)
         return NO;
     
     if (location.horizontalAccuracy < 0)
@@ -208,7 +212,7 @@ NSString * const GWMLocationControllerError = @"GWMLocationControllerError";
         }
         case GWMLocationUpdateModeSignificant:{
             
-            if (location.timestamp.timeIntervalSinceNow > 5.0)
+            if (location.timestamp.timeIntervalSinceNow > kGWMMaximumUsableLocationAge)
                 return;
             
             self.location = location;

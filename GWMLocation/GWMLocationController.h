@@ -65,6 +65,8 @@ extern NSString * const GWMLocationControllerAuthorizationStatus;
  */
 extern NSString * const GWMLocationControllerError;
 
+extern NSTimeInterval const kGWMMaximumUsableLocationAge;
+
 typedef void (^GWMSingleLocationCompletionBlock)(CLLocation *location);
 typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *locations);
 
