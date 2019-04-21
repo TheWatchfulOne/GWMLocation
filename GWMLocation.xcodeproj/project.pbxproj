@@ -18,6 +18,7 @@
 		1A5E2972226BE08D00E284C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A5E2979226BE11B00E284C1 /* GWMLocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GWMLocationController.m; sourceTree = "<group>"; };
 		1A5E297A226BE11B00E284C1 /* GWMLocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GWMLocationController.h; sourceTree = "<group>"; };
+		1A5E2989226C109100E284C1 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +51,7 @@
 		1A5E2970226BE08D00E284C1 /* GWMLocation */ = {
 			isa = PBXGroup;
 			children = (
+				1A5E2989226C109100E284C1 /* module.modulemap */,
 				1A5E2971226BE08D00E284C1 /* GWMLocation.h */,
 				1A5E297A226BE11B00E284C1 /* GWMLocationController.h */,
 				1A5E2979226BE11B00E284C1 /* GWMLocationController.m */,

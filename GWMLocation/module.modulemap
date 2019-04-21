@@ -1,0 +1,4 @@
+framework module GWMLocation {
+    header "Headers/GWMLocation.h"
+    export *
+}
