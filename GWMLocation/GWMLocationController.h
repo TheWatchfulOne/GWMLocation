@@ -59,17 +59,28 @@ extern NSString * const GWMPK_LocationPreferedUpdateMode;
 extern NSString * const GWMLocationControllerCurrentLocation;
 extern NSString * const GWMLocationControllerCurrentHeading;
 extern NSString * const GWMLocationControllerAuthorizationStatus;
-/*!
- * @brief An NSString key into an NSDictionary.
- * @discussion Used to retrieve an NSError object from an NSNotification's userInfo dictionary.
- */
+///@discussion Used to retrieve an NSError object from an NSNotification's userInfo dictionary.
 extern NSString * const GWMLocationControllerError;
 
+///@discussion An NSArray containing the query results.
 extern NSTimeInterval const kGWMMaximumUsableLocationAge;
+/*!
+ * @brief A block that runs on completion of some SQLite queries. Can be nil.
+ * @param location A GWMDataItem containing the itemID of the record that was just inserted or updated.
+ * @param error A GWMDataItem containing the itemID of the record that was just inserted or updated.
+ */
+typedef void (^GWMSingleLocationCompletionBlock)(CLLocation *_Nullable location, NSError *_Nullable error);
+/*!
+ * @brief A block that runs on completion of some SQLite queries. Can be nil.
+ * @param locations A GWMDataItem containing the itemID of the record that was just inserted or updated.
+ * @param error A GWMDataItem containing the itemID of the record that was just inserted or updated.
+ */
+typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *_Nullable locations, NSError *_Nullable error);
 
-typedef void (^GWMSingleLocationCompletionBlock)(CLLocation *location);
-typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *locations);
-
+/*!
+ * @class GWMLocationController
+ * @discussion Use an instance of this class to interact with Location Services.
+ */
 @interface GWMLocationController : NSObject <CLLocationManagerDelegate>
 {
     GWMLocationDesiredAccuracy _locationAccuracy;
@@ -77,20 +88,30 @@ typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *locati
     CLLocationManager *_locationManager;
 }
 
+///@discussion An NSArray containing the query results.
 @property (nonatomic, assign) GWMLocationUpdateMode updateMode;
 
+///@discussion An NSArray containing the query results.
 @property (nonatomic) GWMLocationDesiredAccuracy locationAccuracy;
+///@discussion An NSArray containing the query results.
 @property (nonatomic) GWMDistanceFilter distanceFilter;
 
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) BOOL locationServicesAvailable;
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) BOOL significantChangeLocationMonitoringAvailable;
 
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) CLLocationManager *locationManager;
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) CLLocation *_Nullable location;
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) CLHeading *_Nullable heading;
 
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) BOOL headingAvailable;
 
+///@discussion An NSArray containing the query results.
 @property (nonatomic, readonly) CLAuthorizationStatus authorizationStatus;
 
 +(instancetype)sharedController;
@@ -104,19 +125,33 @@ typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *locati
 
 -(void)startStandardLocationUpdatesWithAccuracy:(GWMLocationDesiredAccuracy)accuracy distance:(GWMDistanceFilter)distance;
 
+///@discussion Start receiving location updates.
 -(void)startStandardLocationUpdates;
+///@discussion Stop receiving location updates.
 -(void)stopStandardLocationUpdates;
 
+///@discussion Start receiving significant location updates.
 -(void)startSignificantChangeLocationUpdates;
+///@discussion Stop receiving significant location updates.
 -(void)stopSignificantChangeLocationUpdates;
 
+/*!
+ * @discussion Start monitoring the specified region.
+ * @param region The CLRegion to monitor.
+ */
 -(void)startMonitoringForRegion:(CLRegion *)region;
+/*!
+ * @discussion Stop monitoring the specified region.
+ * @param region The CLRegion to stop monitoring.
+ */
 -(void)stopMonitoringForRegion:(CLRegion *)region;
 
 -(void)requestLocationAuthorization;
 -(void)stopAllLocationServices;
 
+///@discussion Start receiving heading updates.
 -(void)startUpdatingHeading;
+///@discussion Stop receiving heading updates.
 -(void)stopUpdatingHeading;
 
 @end

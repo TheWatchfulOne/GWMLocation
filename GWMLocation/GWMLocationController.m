@@ -219,7 +219,9 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
             
             NSDictionary *userInfo = @{GWMLocationControllerCurrentLocation: self.location};
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidUpdateSignificantLocationNotification object:self userInfo:userInfo];NSLog(@"Notification (Significant) Posted: %@ Selector: %@", GWMLocationControllerDidUpdateSignificantLocationNotification, NSStringFromSelector(@selector(locationManager:didUpdateLocations:)));
+            [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidUpdateSignificantLocationNotification object:self userInfo:userInfo];
+            
+            NSLog(@"Notification (Significant) Posted: %@ Selector: %@", GWMLocationControllerDidUpdateSignificantLocationNotification, NSStringFromSelector(@selector(locationManager:didUpdateLocations:)));
             
             break;
         }
@@ -233,7 +235,10 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
                     [self stopStandardLocationUpdates];
                     
                     if(self.singleLocationCompletion)
-                        self.singleLocationCompletion(self.location);
+                        self.singleLocationCompletion(self.location, nil);
+                    
+                    if(self.multipleLocationsCompletion)
+                        self.multipleLocationsCompletion(locations, nil);
                     
                     NSDictionary *userInfo = @{GWMLocationControllerCurrentLocation: self.location};
                     
@@ -280,7 +285,11 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidFailWithErrorNotification object:self userInfo:userInfo];
     
-//    NSLog(@"Notification Posted: %@ Message: %@", GWMLocationControllerDidFailWithErrorNotification, error.localizedDescription);
+    if(self.singleLocationCompletion)
+        self.singleLocationCompletion(nil, error);
+    
+    if(self.multipleLocationsCompletion)
+        self.multipleLocationsCompletion(nil, error);
 }
 
 #pragma mark Paused
