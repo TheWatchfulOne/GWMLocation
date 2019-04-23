@@ -8,6 +8,7 @@
 
 #import "GWMLocationController.h"
 
+#pragma mark Notification Identifiers
 NSString * const GWMLocationControllerDidStartUpdatingLocationsNotification = @"GWMLocationControllerDidStartUpdatingLocationsNotification";
 NSString * const GWMLocationControllerDidStopUpdatingLocationsNotification = @"GWMLocationControllerDidStopUpdatingLocationsNotification";
 NSString * const GWMLocationControllerDidStartMonitoringSignificantLocationChangesNotification = @"GWMLocationControllerDidStartMonitoringSignificantLocationChangesNotification";
@@ -20,12 +21,14 @@ NSString * const GWMLocationControllerDidUpdateHeadingNotification = @"GWMLocati
 NSString * const GWMLocationControllerDidFailWithErrorNotification = @"GWMLocationControllerDidFailWithErrorNotification";
 NSString * const GWMLocationControllerDidUpdateAuthorizationStatusNotification = @"GWMLocationControllerDidUpdateAuthorizationStatusNotification";
 
+#pragma mark Preference Keys
 NSString * const GWMPK_LocationDesiredAccuracy = @"GWMPK_LocationDesiredAccuracy";
 NSString * const GWMPK_LocationDistanceFilter = @"GWMPK_LocationDistanceFilter";
 NSString * const GWMPK_LocationUpdateFrquency = @"GWMPK_LocationUpdateFrquency";
 NSString * const GWMPK_LocationUserTrackingMode = @"GWMPK_LocationUserTrackingMode";
 NSString * const GWMPK_LocationPreferedUpdateMode = @"GWMPK_LocationPreferedUpdateMode";
 
+#pragma mark Notification User Info Keys
 NSString * const GWMLocationControllerCurrentLocation = @"GWMLocationControllerCurrentLocation";
 NSString * const GWMLocationControllerCurrentHeading = @"GWMLocationControllerCurrentHeading";
 NSString * const GWMLocationControllerAuthorizationStatus = @"GWMLocationControllerAuthorizationStatus";
