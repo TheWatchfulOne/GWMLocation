@@ -65,15 +65,15 @@ extern NSString * const GWMLocationControllerError;
 ///@discussion An NSArray containing the query results.
 extern NSTimeInterval const kGWMMaximumUsableLocationAge;
 /*!
- * @brief A block that runs on completion of some SQLite queries. Can be nil.
- * @param location A GWMDataItem containing the itemID of the record that was just inserted or updated.
- * @param error A GWMDataItem containing the itemID of the record that was just inserted or updated.
+ * @brief This block gets called when a new location is acquired.
+ * @param location A CLLocation oject representing the most recent acquired location.
+ * @param error A NSError object.
  */
 typedef void (^GWMSingleLocationCompletionBlock)(CLLocation *_Nullable location, NSError *_Nullable error);
 /*!
- * @brief A block that runs on completion of some SQLite queries. Can be nil.
- * @param locations A GWMDataItem containing the itemID of the record that was just inserted or updated.
- * @param error A GWMDataItem containing the itemID of the record that was just inserted or updated.
+ * @brief This block gets called when a new location is acquired.
+ * @param locations A NSArray of CLLocation objects.
+ * @param error A NSError object.
  */
 typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *_Nullable locations, NSError *_Nullable error);
 
