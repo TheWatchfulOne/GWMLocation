@@ -39,6 +39,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 @property (nonatomic, strong) GWMSingleLocationCompletionBlock _Nullable singleLocationCompletion;
 @property (nonatomic, strong) GWMMultipleLocationsCompletionBlock _Nullable multipleLocationsCompletion;
+@property (nonatomic, readonly) NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_Nullable regionChangeCompletionInfo;
 
 @end
 
@@ -85,6 +86,13 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     [self stopAllLocationServices];
     _locationManager.delegate = nil;
     _locationManager = nil;
+}
+
+-(NSMutableDictionary *)regionChangeCompletionInfo
+{
+    if(!_regionChangeCompletionInfo)
+        _regionChangeCompletionInfo = [NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> new];
+    return _regionChangeCompletionInfo;
 }
 
 #pragma mark - Controllers
@@ -306,13 +314,15 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark Region Monitoring
 
--(void)startMonitoringForRegion:(CLRegion *)region
+-(void)startMonitoringForRegion:(CLRegion *)region completion:(nonnull GWMRegionChangeCompletionBlock)completion
 {
+    self.regionChangeCompletionInfo[region.identifier] = completion;
     [self.locationManager startMonitoringForRegion:region];
 }
 
 -(void)stopMonitoringForRegion:(CLRegion *)region
 {
+    self.regionChangeCompletionInfo[region.identifier] = nil;
     [self.locationManager stopMonitoringForRegion:region];
 }
 
@@ -323,12 +333,23 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region
 {
-    
+    GWMRegionChangeCompletionBlock completion = self.regionChangeCompletionInfo[region.identifier];
+    if(completion)
+        completion(GWMRegionEntered, region, nil);
 }
 
 -(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
 {
-    
+    GWMRegionChangeCompletionBlock completion = self.regionChangeCompletionInfo[region.identifier];
+    if(completion)
+        completion(GWMRegionExited, region, nil);
+}
+
+-(void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region withError:(NSError *)error
+{
+    GWMRegionChangeCompletionBlock completion = self.regionChangeCompletionInfo[region.identifier];
+    if(completion)
+        completion(GWMRegionError, region, error);
 }
 
 #pragma mark Authorization

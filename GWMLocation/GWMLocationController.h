@@ -36,6 +36,12 @@ typedef NS_ENUM(NSInteger, GWMDistanceFilter) {
     GWMDistanceFilterTenMeters
 };
 
+typedef NS_ENUM(NSInteger, GWMRegionChange) {
+    GWMRegionEntered = 0,
+    GWMRegionExited,
+    GWMRegionError
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const GWMLocationControllerDidStartUpdatingLocationsNotification;
@@ -76,6 +82,13 @@ typedef void (^GWMSingleLocationCompletionBlock)(CLLocation *_Nullable location,
  * @param error A NSError object.
  */
 typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *_Nullable locations, NSError *_Nullable error);
+/*!
+ * @brief This block gets called when entering or exiting a new region.
+ * @param region A CLRegion oject representing the region that was just entered or exited.
+ * @param change A GWMRegionChange value indicating whether the region was entered or exited.
+ * @param error A NSError object.
+ */
+typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion *_Nullable region, NSError *_Nullable error);
 
 /*!
  * @class GWMLocationController
@@ -86,6 +99,7 @@ typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *_Nulla
     GWMLocationDesiredAccuracy _locationAccuracy;
     GWMDistanceFilter _distanceFilter;
     CLLocationManager *_locationManager;
+    NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_regionChangeCompletionInfo;
 }
 
 ///@discussion An NSArray containing the query results.
@@ -139,7 +153,7 @@ typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *_Nulla
  * @discussion Start monitoring the specified region.
  * @param region The CLRegion to monitor.
  */
--(void)startMonitoringForRegion:(CLRegion *)region;
+-(void)startMonitoringForRegion:(CLRegion *)region completion:(GWMRegionChangeCompletionBlock)completion;
 /*!
  * @discussion Stop monitoring the specified region.
  * @param region The CLRegion to stop monitoring.
