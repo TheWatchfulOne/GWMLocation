@@ -319,14 +319,24 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)startMonitoringForRegion:(CLRegion *)region completion:(nonnull GWMRegionChangeCompletionBlock)completion
 {
+    if (self.authorizationStatus != kCLAuthorizationStatusAuthorizedAlways)
+        [self.locationManager requestAlwaysAuthorization];
+    
     self.regionChangeCompletionInfo[region.identifier] = completion;
     [self.locationManager startMonitoringForRegion:region];
 }
 
 -(void)stopMonitoringForRegion:(CLRegion *)region
 {
-    self.regionChangeCompletionInfo[region.identifier] = nil;
     [self.locationManager stopMonitoringForRegion:region];
+    self.regionChangeCompletionInfo[region.identifier] = nil;
+}
+
+-(void)stopMonitorigAllRegions
+{
+    [self.locationManager.monitoredRegions enumerateObjectsUsingBlock:^(__kindof CLRegion *_Nonnull reg, BOOL *stop){
+        [self stopMonitoringForRegion:reg];
+    }];
 }
 
 -(void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region
@@ -368,6 +378,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
         {
             [self stopSignificantChangeLocationUpdates];
+            [self stopMonitorigAllRegions];
             break;
         }
         case kCLAuthorizationStatusDenied:
@@ -376,6 +387,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
         {
             [self stopStandardLocationUpdates];
             [self stopSignificantChangeLocationUpdates];
+            [self stopMonitorigAllRegions];
             break;
         }
         default:

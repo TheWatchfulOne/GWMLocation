@@ -160,6 +160,8 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
  */
 -(void)stopMonitoringForRegion:(CLRegion *)region;
 
+-(void)stopMonitorigAllRegions;
+
 -(void)requestLocationAuthorization;
 -(void)stopAllLocationServices;
 
