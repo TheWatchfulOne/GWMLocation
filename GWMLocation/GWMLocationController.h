@@ -44,31 +44,34 @@ typedef NS_ENUM(NSInteger, GWMRegionChange) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString * const GWMLocationControllerDidStartUpdatingLocationsNotification;
-extern NSString * const GWMLocationControllerDidStopUpdatingLocationsNotification;
-extern NSString * const GWMLocationControllerDidStartMonitoringSignificantLocationChangesNotification;
-extern NSString * const GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification;
-extern NSString * const GWMLocationControllerDidUpdateLocationNotification;
-extern NSString * const GWMLocationControllerDidUpdateSignificantLocationNotification;
-extern NSString * const GWMLocationControllerDidStartUpdatingHeadingNotification;
-extern NSString * const GWMLocationControllerDidStopUpdatingHeadingNotification;
-extern NSString * const GWMLocationControllerDidUpdateHeadingNotification;
-extern NSString * const GWMLocationControllerDidFailWithErrorNotification;
-extern NSString * const GWMLocationControllerDidUpdateAuthorizationStatusNotification;
-
+#pragma mark Notification Names
+extern NSNotificationName const GWMLocationControllerDidStartUpdatingLocationsNotification;
+extern NSNotificationName const GWMLocationControllerDidStopUpdatingLocationsNotification;
+extern NSNotificationName const GWMLocationControllerDidStartMonitoringSignificantLocationChangesNotification;
+extern NSNotificationName const GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification;
+extern NSNotificationName const GWMLocationControllerDidUpdateLocationNotification;
+extern NSNotificationName const GWMLocationControllerDidUpdateSignificantLocationNotification;
+extern NSNotificationName const GWMLocationControllerDidStartUpdatingHeadingNotification;
+extern NSNotificationName const GWMLocationControllerDidStopUpdatingHeadingNotification;
+extern NSNotificationName const GWMLocationControllerDidUpdateHeadingNotification;
+extern NSNotificationName const GWMLocationControllerDidFailWithErrorNotification;
+extern NSNotificationName const GWMLocationControllerDidUpdateAuthorizationStatusNotification;
+#pragma mark Preference Keys
 extern NSString * const GWMPK_LocationDesiredAccuracy;
 extern NSString * const GWMPK_LocationDistanceFilter;
 extern NSString * const GWMPK_LocationUpdateFrquency;
 extern NSString * const GWMPK_LocationUserTrackingMode;
 extern NSString * const GWMPK_LocationPreferedUpdateMode;
-
+#pragma mark Notification UserInfo Keys
+///@brief Used to retrieve the CLLocation object representing the current location from an NSNotification's userInfo dictionary.
 extern NSString * const GWMLocationControllerCurrentLocation;
+///@brief Used to retrieve the CLHeading object representing the current heading from an NSNotification's userInfo dictionary.
 extern NSString * const GWMLocationControllerCurrentHeading;
 extern NSString * const GWMLocationControllerAuthorizationStatus;
-///@discussion Used to retrieve an NSError object from an NSNotification's userInfo dictionary.
+///@brief Used to retrieve an NSError object from an NSNotification's userInfo dictionary.
 extern NSString * const GWMLocationControllerError;
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 extern NSTimeInterval const kGWMMaximumUsableLocationAge;
 /*!
  * @brief This block gets called when a new location is acquired.
@@ -102,30 +105,30 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
     NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_regionChangeCompletionInfo;
 }
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, assign) GWMLocationUpdateMode updateMode;
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic) GWMLocationDesiredAccuracy locationAccuracy;
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic) GWMDistanceFilter distanceFilter;
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) BOOL locationServicesAvailable;
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) BOOL significantChangeLocationMonitoringAvailable;
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) CLLocationManager *locationManager;
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) CLLocation *_Nullable location;
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) CLHeading *_Nullable heading;
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) BOOL headingAvailable;
 
-///@discussion An NSArray containing the query results.
+///@brief An NSArray containing the query results.
 @property (nonatomic, readonly) CLAuthorizationStatus authorizationStatus;
 
 +(instancetype)sharedController;
@@ -139,23 +142,23 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 
 -(void)startStandardLocationUpdatesWithAccuracy:(GWMLocationDesiredAccuracy)accuracy distance:(GWMDistanceFilter)distance;
 
-///@discussion Start receiving location updates.
+///@brief Start receiving location updates.
 -(void)startStandardLocationUpdates;
-///@discussion Stop receiving location updates.
+///@brief Stop receiving location updates.
 -(void)stopStandardLocationUpdates;
 
-///@discussion Start receiving significant location updates.
+///@brief Start receiving significant location updates.
 -(void)startSignificantChangeLocationUpdates;
-///@discussion Stop receiving significant location updates.
+///@brief Stop receiving significant location updates.
 -(void)stopSignificantChangeLocationUpdates;
 
 /*!
- * @discussion Start monitoring the specified region.
+ * @brief Start monitoring the specified region.
  * @param region The CLRegion to monitor.
  */
 -(void)startMonitoringForRegion:(CLRegion *)region completion:(GWMRegionChangeCompletionBlock)completion;
 /*!
- * @discussion Stop monitoring the specified region.
+ * @brief Stop monitoring the specified region.
  * @param region The CLRegion to stop monitoring.
  */
 -(void)stopMonitoringForRegion:(CLRegion *)region;
@@ -165,9 +168,9 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 -(void)requestLocationAuthorization;
 -(void)stopAllLocationServices;
 
-///@discussion Start receiving heading updates.
+///@brief Start receiving heading updates.
 -(void)startUpdatingHeading;
-///@discussion Stop receiving heading updates.
+///@brief Stop receiving heading updates.
 -(void)stopUpdatingHeading;
 
 @end
