@@ -32,16 +32,27 @@ typedef NS_ENUM(NSInteger, GWMRegionChange) {
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Notification Names
+///@brief Posted when location updates have started.
 extern NSNotificationName const GWMLocationControllerDidStartUpdatingLocationsNotification;
+///@brief Posted when location updates have stopped.
 extern NSNotificationName const GWMLocationControllerDidStopUpdatingLocationsNotification;
+///@brief Posted when significant location updates have started.
 extern NSNotificationName const GWMLocationControllerDidStartMonitoringSignificantLocationChangesNotification;
+///@brief Posted when significant location updates have stopped.
 extern NSNotificationName const GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification;
+///@brief Posted when location is updated.
 extern NSNotificationName const GWMLocationControllerDidUpdateLocationNotification;
+///@brief Posted when location is updated by a significant location change.
 extern NSNotificationName const GWMLocationControllerDidUpdateSignificantLocationNotification;
+///@brief Posted when heading updates have started.
 extern NSNotificationName const GWMLocationControllerDidStartUpdatingHeadingNotification;
+///@brief Posted when heading updates have stopped.
 extern NSNotificationName const GWMLocationControllerDidStopUpdatingHeadingNotification;
+///@brief Posted when heading is updated.
 extern NSNotificationName const GWMLocationControllerDidUpdateHeadingNotification;
+///@brief Posted when location updates have failed.
 extern NSNotificationName const GWMLocationControllerDidFailWithErrorNotification;
+///@brief Posted when location authorization status changes.
 extern NSNotificationName const GWMLocationControllerDidUpdateAuthorizationStatusNotification;
 #pragma mark Preference Keys
 extern NSString * const GWMPK_LocationDesiredAccuracy;
