@@ -111,69 +111,26 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark - LocationAccuracy
 
--(GWMLocationDesiredAccuracy)locationAccuracy
+-(CLLocationAccuracy)locationAccuracy
 {
-    return _locationAccuracy;
+    return self.locationManager.desiredAccuracy;
 }
 
--(void)setLocationAccuracy:(GWMLocationDesiredAccuracy)locationAccuracy
+-(void)setLocationAccuracy:(CLLocationAccuracy)locationAccuracy
 {
-    _locationAccuracy = locationAccuracy;
-    switch (locationAccuracy) {
-        case GWMLocationDesiredAccuracyBest:
-        {
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            break;
-        }
-        case GWMLocationDesiredAccuracyTenMeters:
-        {
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-            break;
-        }
-        case GWMLocationDesiredAccuracyHundredMeters:
-        {
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-            break;
-        }
-        case GWMLocationDesiredAccuracyKilometer:
-        {
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
-            break;
-        }
-        default:
-            break;
-    }
+    self.locationManager.desiredAccuracy = locationAccuracy;
 }
 
 #pragma mark - Distance Filter
 
--(GWMDistanceFilter)distanceFilter
+-(CLLocationDistance)distanceFilter
 {
-    return _distanceFilter;
+    return self.locationManager.distanceFilter;
 }
 
--(void)setDistanceFilter:(GWMDistanceFilter)distanceFilter
+-(void)setDistanceFilter:(CLLocationDistance)distanceFilter
 {
-    _distanceFilter = distanceFilter;
-    switch (distanceFilter) {
-        case GWMDistanceFilterNone:
-        {
-            self.locationManager.distanceFilter = kCLDistanceFilterNone;
-            break;
-        }
-        case GWMDistanceFilterFiveMeters:
-        {
-            self.locationManager.distanceFilter = 5;
-            break;
-        }
-        case GWMDistanceFilterTenMeters:
-        {
-            self.locationManager.distanceFilter = 10;
-            break;
-        }
-        default:
-            break;
-    }
+    self.locationManager.distanceFilter = distanceFilter;
 }
 
 #pragma mark - Getting Locations
@@ -460,7 +417,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark - Starting and stopping location updates
 
--(void)startStandardLocationUpdatesWithAccuracy:(GWMLocationDesiredAccuracy)accuracy distance:(GWMDistanceFilter)distance
+-(void)startStandardLocationUpdatesWithAccuracy:(CLLocationAccuracy)accuracy distance:(CLLocationDistance)distance
 {
     [self.locationManager stopUpdatingLocation];
     [self.locationManager stopMonitoringSignificantLocationChanges];

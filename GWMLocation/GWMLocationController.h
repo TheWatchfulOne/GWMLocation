@@ -23,19 +23,6 @@ typedef NS_ENUM(NSInteger, GWMLocationUpdateMode) {
     GWMLocationUpdateModeSignificant
 };
 
-typedef NS_ENUM(NSInteger, GWMLocationDesiredAccuracy) {
-    GWMLocationDesiredAccuracyBest = 0,
-    GWMLocationDesiredAccuracyTenMeters,
-    GWMLocationDesiredAccuracyHundredMeters,
-    GWMLocationDesiredAccuracyKilometer
-};
-
-typedef NS_ENUM(NSInteger, GWMDistanceFilter) {
-    GWMDistanceFilterNone = 0,
-    GWMDistanceFilterFiveMeters,
-    GWMDistanceFilterTenMeters
-};
-
 typedef NS_ENUM(NSInteger, GWMRegionChange) {
     GWMRegionEntered = 0,
     GWMRegionExited,
@@ -99,8 +86,6 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
  */
 @interface GWMLocationController : NSObject <CLLocationManagerDelegate>
 {
-    GWMLocationDesiredAccuracy _locationAccuracy;
-    GWMDistanceFilter _distanceFilter;
     CLLocationManager *_locationManager;
     NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_regionChangeCompletionInfo;
 }
@@ -108,29 +93,32 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 ///@brief An NSArray containing the query results.
 @property (nonatomic, assign) GWMLocationUpdateMode updateMode;
 
-///@brief An NSArray containing the query results.
-@property (nonatomic) GWMLocationDesiredAccuracy locationAccuracy;
-///@brief An NSArray containing the query results.
-@property (nonatomic) GWMDistanceFilter distanceFilter;
-
-///@brief An NSArray containing the query results.
+///@brief The current minimum accuracy of locations acquired by the device.
+@property (nonatomic) CLLocationAccuracy locationAccuracy;
+///@brief The minimum distance the device needs to move before a new location event is triggered.
+@property (nonatomic) CLLocationDistance distanceFilter;
+/*!
+ * @brief Tells whether Location Services are available on the device.
+ * @discussion The is affected by the capabilities of the device as well as the authorization status.
+ */
 @property (nonatomic, readonly) BOOL locationServicesAvailable;
-///@brief An NSArray containing the query results.
+///@brief Tells whether the device is capable of monitoring for significant location changes.
 @property (nonatomic, readonly) BOOL significantChangeLocationMonitoringAvailable;
 
-///@brief An NSArray containing the query results.
+///@brief The location manager.
 @property (nonatomic, readonly) CLLocationManager *locationManager;
-///@brief An NSArray containing the query results.
+///@brief The most recently acquired location.
 @property (nonatomic, readonly) CLLocation *_Nullable location;
-///@brief An NSArray containing the query results.
+///@brief The most recently acquired heading.
 @property (nonatomic, readonly) CLHeading *_Nullable heading;
 
-///@brief An NSArray containing the query results.
+///@brief Tells whether the device can acquire a heading.
 @property (nonatomic, readonly) BOOL headingAvailable;
 
-///@brief An NSArray containing the query results.
+///@brief The current permission granted for acquiring locations.
 @property (nonatomic, readonly) CLAuthorizationStatus authorizationStatus;
 
+///@brief The shared GWMLocationController instance.
 +(instancetype)sharedController;
 
 #pragma mark - Getting Locations
@@ -140,7 +128,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 
 #pragma mark -
 
--(void)startStandardLocationUpdatesWithAccuracy:(GWMLocationDesiredAccuracy)accuracy distance:(GWMDistanceFilter)distance;
+-(void)startStandardLocationUpdatesWithAccuracy:(CLLocationAccuracy)accuracy distance:(CLLocationDistance)distance;
 
 ///@brief Start receiving location updates.
 -(void)startStandardLocationUpdates;
