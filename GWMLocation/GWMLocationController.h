@@ -90,7 +90,10 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
     NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_regionChangeCompletionInfo;
 }
 
-///@brief An NSArray containing the query results.
+/*!
+ * @brief Indicates the frequency at which location updates might happen.
+ * @discussion The basic value choices are 'none', 'standard' and 'significant'. A value of 'significant' indicates significant change location monitoring is happening and therefore acquired locations will be scrutinized less strenuously than for standard location updates.
+ */
 @property (nonatomic, assign) GWMLocationUpdateMode updateMode;
 
 ///@brief The current minimum accuracy of locations acquired by the device.
@@ -99,7 +102,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 @property (nonatomic) CLLocationDistance distanceFilter;
 /*!
  * @brief Tells whether Location Services are available on the device.
- * @discussion The is affected by the capabilities of the device as well as the authorization status.
+ * @discussion This is affected by the capabilities of the device as well as the authorization status.
  */
 @property (nonatomic, readonly) BOOL locationServicesAvailable;
 ///@brief Tells whether the device is capable of monitoring for significant location changes.
