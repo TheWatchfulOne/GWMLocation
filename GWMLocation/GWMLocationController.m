@@ -66,29 +66,15 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 {
     if (self = [super init]) {
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
-        
-        self.locationAccuracy = [[[NSUserDefaults standardUserDefaults] valueForKey:GWMPK_LocationDesiredAccuracy] integerValue];
+        self.desiredAccuracy = [[[NSUserDefaults standardUserDefaults] valueForKey:GWMPK_LocationDesiredAccuracy] integerValue];
         
         self.distanceFilter = [[[NSUserDefaults standardUserDefaults] valueForKey:GWMPK_LocationDistanceFilter] integerValue];
         
         self.locationManager.activityType = CLActivityTypeOther;
-        
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        self.locationManager.distanceFilter = kCLDistanceFilterNone;
     }
     return self;
-}
-
--(void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
-    
-}
-
--(void)applicationDidReceiveMemoryWarning
-{
-    [self stopAllLocationServices];
-    _locationManager.delegate = nil;
-    _locationManager = nil;
 }
 
 -(NSMutableDictionary *)regionChangeCompletionInfo
@@ -111,12 +97,12 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark - LocationAccuracy
 
--(CLLocationAccuracy)locationAccuracy
+-(CLLocationAccuracy)desiredAccuracy
 {
     return self.locationManager.desiredAccuracy;
 }
 
--(void)setLocationAccuracy:(CLLocationAccuracy)locationAccuracy
+-(void)setDesiredAccuracy:(CLLocationAccuracy)locationAccuracy
 {
     self.locationManager.desiredAccuracy = locationAccuracy;
 }
@@ -161,7 +147,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     if (location.horizontalAccuracy < 0)
         return NO;
     
-    if (location.horizontalAccuracy > self.locationManager.desiredAccuracy)
+    if (self.desiredAccuracy != kCLLocationAccuracyBest && self.desiredAccuracy != kCLLocationAccuracyBestForNavigation && location.horizontalAccuracy > self.desiredAccuracy)
         return NO;
     
     return YES;
@@ -419,13 +405,13 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)startStandardLocationUpdatesWithAccuracy:(CLLocationAccuracy)accuracy distance:(CLLocationDistance)distance
 {
-    [self.locationManager stopUpdatingLocation];
-    [self.locationManager stopMonitoringSignificantLocationChanges];
-    
     if (!self.locationServicesAvailable)
         return;
     
-    self.locationAccuracy = accuracy;
+    [self.locationManager stopUpdatingLocation];
+    [self.locationManager stopMonitoringSignificantLocationChanges];
+    
+    self.desiredAccuracy = accuracy;
     
     self.distanceFilter = distance;
     
@@ -439,11 +425,11 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)startStandardLocationUpdates
 {
+    if (!self.locationServicesAvailable)
+        return;
+    
     [self.locationManager stopUpdatingLocation];
-    
-    self.locationAccuracy = [[[NSUserDefaults standardUserDefaults] valueForKey:GWMPK_LocationDesiredAccuracy] integerValue];
-    
-    self.distanceFilter = [[[NSUserDefaults standardUserDefaults] valueForKey:GWMPK_LocationDistanceFilter] integerValue];
+    [self.locationManager stopMonitoringSignificantLocationChanges];
     
     self.updateMode = GWMLocationUpdateModeStandard;
     [self.locationManager startUpdatingLocation];

@@ -108,7 +108,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 @property (nonatomic, assign) GWMLocationUpdateMode updateMode;
 
 ///@brief The current minimum accuracy of locations acquired by the device.
-@property (nonatomic) CLLocationAccuracy locationAccuracy;
+@property (nonatomic) CLLocationAccuracy desiredAccuracy;
 ///@brief The minimum distance the device needs to move before a new location event is triggered.
 @property (nonatomic) CLLocationDistance distanceFilter;
 /*!
