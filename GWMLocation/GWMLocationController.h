@@ -97,7 +97,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
  */
 @interface GWMLocationController : NSObject <CLLocationManagerDelegate>
 {
-    CLLocationManager *_locationManager;
+    CLLocationManager *_manager;
     NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_regionChangeCompletionInfo;
 }
 
@@ -120,7 +120,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 @property (nonatomic, readonly) BOOL significantChangeLocationMonitoringAvailable;
 
 ///@brief The location manager.
-@property (nonatomic, readonly) CLLocationManager *locationManager;
+@property (nonatomic, readonly) CLLocationManager *manager;
 ///@brief The most recently acquired location.
 @property (nonatomic, readonly) CLLocation *_Nullable location;
 ///@brief The most recently acquired heading.

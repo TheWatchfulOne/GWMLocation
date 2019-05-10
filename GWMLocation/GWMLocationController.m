@@ -70,9 +70,9 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
         
         self.distanceFilter = [[[NSUserDefaults standardUserDefaults] valueForKey:GWMPK_LocationDistanceFilter] integerValue];
         
-        self.locationManager.activityType = CLActivityTypeOther;
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        self.locationManager.distanceFilter = kCLDistanceFilterNone;
+        self.manager.activityType = CLActivityTypeOther;
+        self.manager.desiredAccuracy = kCLLocationAccuracyBest;
+        self.manager.distanceFilter = kCLDistanceFilterNone;
     }
     return self;
 }
@@ -86,49 +86,49 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark - Controllers
 
--(CLLocationManager *)locationManager
+-(CLLocationManager *)manager
 {
-    if (!_locationManager) {
-        _locationManager = [[CLLocationManager alloc] init];
-        _locationManager.delegate = self;
+    if (!_manager) {
+        _manager = [[CLLocationManager alloc] init];
+        _manager.delegate = self;
     }
-    return _locationManager;
+    return _manager;
 }
 
 #pragma mark - Authorization
 
 -(void)requestAuthorization
 {
-    [self.locationManager requestWhenInUseAuthorization];
+    [self.manager requestWhenInUseAuthorization];
 }
 
 -(void)requestAlwaysAuthorization
 {
-    [self.locationManager requestAlwaysAuthorization];
+    [self.manager requestAlwaysAuthorization];
 }
 
 #pragma mark - LocationAccuracy
 
 -(CLLocationAccuracy)desiredAccuracy
 {
-    return self.locationManager.desiredAccuracy;
+    return self.manager.desiredAccuracy;
 }
 
 -(void)setDesiredAccuracy:(CLLocationAccuracy)locationAccuracy
 {
-    self.locationManager.desiredAccuracy = locationAccuracy;
+    self.manager.desiredAccuracy = locationAccuracy;
 }
 
 #pragma mark - Distance Filter
 
 -(CLLocationDistance)distanceFilter
 {
-    return self.locationManager.distanceFilter;
+    return self.manager.distanceFilter;
 }
 
 -(void)setDistanceFilter:(CLLocationDistance)distanceFilter
 {
-    self.locationManager.distanceFilter = distanceFilter;
+    self.manager.distanceFilter = distanceFilter;
 }
 
 #pragma mark - Getting Locations
@@ -275,21 +275,21 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 -(void)startMonitoringForRegion:(CLRegion *)region completion:(nonnull GWMRegionChangeCompletionBlock)completion
 {
     if (self.authorizationStatus != kCLAuthorizationStatusAuthorizedAlways)
-        [self.locationManager requestAlwaysAuthorization];
+        [self.manager requestAlwaysAuthorization];
     
     self.regionChangeCompletionInfo[region.identifier] = completion;
-    [self.locationManager startMonitoringForRegion:region];
+    [self.manager startMonitoringForRegion:region];
 }
 
 -(void)stopMonitoringForRegion:(CLRegion *)region
 {
-    [self.locationManager stopMonitoringForRegion:region];
+    [self.manager stopMonitoringForRegion:region];
     self.regionChangeCompletionInfo[region.identifier] = nil;
 }
 
 -(void)stopMonitorigAllRegions
 {
-    [self.locationManager.monitoredRegions enumerateObjectsUsingBlock:^(__kindof CLRegion *_Nonnull reg, BOOL *stop){
+    [self.manager.monitoredRegions enumerateObjectsUsingBlock:^(__kindof CLRegion *_Nonnull reg, BOOL *stop){
         [self stopMonitoringForRegion:reg];
     }];
 }
@@ -365,7 +365,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(CLHeading *)heading
 {
-    return self.locationManager.heading;
+    return self.manager.heading;
 }
 
 #pragma mark - Testing Location Services availability
@@ -420,15 +420,15 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     if (!self.locationServicesAvailable)
         return;
     
-    [self.locationManager stopUpdatingLocation];
-    [self.locationManager stopMonitoringSignificantLocationChanges];
+    [self.manager stopUpdatingLocation];
+    [self.manager stopMonitoringSignificantLocationChanges];
     
     self.desiredAccuracy = accuracy;
     
     self.distanceFilter = distance;
     
     self.updateMode = GWMLocationUpdateModeStandard;
-    [self.locationManager startUpdatingLocation];
+    [self.manager startUpdatingLocation];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStartUpdatingLocationsNotification object:self];
     
@@ -440,11 +440,11 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     if (!self.locationServicesAvailable)
         return;
     
-    [self.locationManager stopUpdatingLocation];
-    [self.locationManager stopMonitoringSignificantLocationChanges];
+    [self.manager stopUpdatingLocation];
+    [self.manager stopMonitoringSignificantLocationChanges];
     
     self.updateMode = GWMLocationUpdateModeStandard;
-    [self.locationManager startUpdatingLocation];
+    [self.manager startUpdatingLocation];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStartUpdatingLocationsNotification object:self];
     
@@ -454,7 +454,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 -(void)stopStandardLocationUpdates
 {
     self.updateMode = GWMLocationUpdateModeNone;
-    [self.locationManager stopUpdatingLocation];
+    [self.manager stopUpdatingLocation];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopUpdatingLocationsNotification object:self];
     
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStopUpdatingLocationsNotification);
@@ -465,10 +465,10 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     if (![self locationServicesAvailable] || ![self significantChangeLocationMonitoringAvailable])
         return;
         
-    [self.locationManager stopUpdatingLocation];
+    [self.manager stopUpdatingLocation];
     
     self.updateMode = GWMLocationUpdateModeSignificant;
-    [self.locationManager startMonitoringSignificantLocationChanges];
+    [self.manager startMonitoringSignificantLocationChanges];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStartMonitoringSignificantLocationChangesNotification object:self];
     
@@ -478,7 +478,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 -(void)stopSignificantChangeLocationUpdates
 {
     self.updateMode = GWMLocationUpdateModeNone;
-    [self.locationManager stopMonitoringSignificantLocationChanges];
+    [self.manager stopMonitoringSignificantLocationChanges];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification object:self];
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification);
 }
@@ -497,14 +497,14 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     if (!self.headingAvailable)
         return;
     
-    [self.locationManager startUpdatingHeading];
+    [self.manager startUpdatingHeading];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStartUpdatingHeadingNotification object:self];
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStartUpdatingHeadingNotification);
 }
 
 -(void)stopUpdatingHeading
 {
-    [self.locationManager stopUpdatingHeading];
+    [self.manager stopUpdatingHeading];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopUpdatingHeadingNotification object:self];
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStopUpdatingHeadingNotification);
 }
