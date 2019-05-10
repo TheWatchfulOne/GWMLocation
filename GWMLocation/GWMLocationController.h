@@ -135,6 +135,11 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 ///@brief The shared GWMLocationController instance.
 +(instancetype)sharedController;
 
+#pragma mark - Authorization
+
+-(void)requestAuthorization;
+-(void)requestAlwaysAuthorization;
+
 #pragma mark - Getting Locations
 
 -(void)singleLocationWithCompletion:(GWMSingleLocationCompletionBlock)completionHandler;
@@ -166,8 +171,6 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 -(void)stopMonitoringForRegion:(CLRegion *)region;
 
 -(void)stopMonitorigAllRegions;
-
--(void)requestLocationAuthorization;
 -(void)stopAllLocationServices;
 
 ///@brief Start receiving heading updates.

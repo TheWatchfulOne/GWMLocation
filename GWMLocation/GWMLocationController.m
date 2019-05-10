@@ -95,6 +95,18 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     return _locationManager;
 }
 
+#pragma mark - Authorization
+
+-(void)requestAuthorization
+{
+    [self.locationManager requestWhenInUseAuthorization];
+}
+
+-(void)requestAlwaysAuthorization
+{
+    [self.locationManager requestAlwaysAuthorization];
+}
+
 #pragma mark - LocationAccuracy
 
 -(CLLocationAccuracy)desiredAccuracy
@@ -469,11 +481,6 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     [self.locationManager stopMonitoringSignificantLocationChanges];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification object:self];
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification);
-}
-
--(void)requestLocationAuthorization
-{
-    [self.locationManager requestWhenInUseAuthorization];
 }
 
 -(void)stopAllLocationServices
