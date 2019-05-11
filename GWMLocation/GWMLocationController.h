@@ -23,6 +23,12 @@ typedef NS_ENUM(NSInteger, GWMLocationUpdateMode) {
     GWMLocationUpdateModeSignificant
 };
 
+typedef NS_ENUM(NSInteger, GWMLocationUpdateStyle) {
+    GWMLocationUpdateStyleNone = 0,
+    GWMLocationUpdateStyleSingle,
+    GWMLocationUpdateStyleMultiple
+};
+
 typedef NS_ENUM(NSInteger, GWMRegionChange) {
     GWMRegionEntered = 0,
     GWMRegionExited,
@@ -76,13 +82,19 @@ extern NSTimeInterval const kGWMMaximumUsableLocationAge;
  * @param location A CLLocation oject representing the most recent acquired location.
  * @param error A NSError object.
  */
-typedef void (^GWMSingleLocationCompletionBlock)(CLLocation *_Nullable location, NSError *_Nullable error);
+typedef void (^GWMLocationCompletionBlock)(CLLocation *_Nullable location, NSError *_Nullable error);
 /*!
  * @brief This block gets called when a new location is acquired.
  * @param locations A NSArray of CLLocation objects.
  * @param error A NSError object.
  */
-typedef void (^GWMMultipleLocationsCompletionBlock)(NSArray<CLLocation*> *_Nullable locations, NSError *_Nullable error);
+typedef void (^GWMLocationsUpdateBlock)(NSArray<CLLocation*> *_Nullable locations, NSError *_Nullable error);
+/*!
+ * @brief This block gets called when a new heading is acquired.
+ * @param heading A CLHeading oject representing the most recent acquired heading.
+ * @param error A NSError object.
+ */
+typedef void (^GWMHeadingUpdateBlock)(CLHeading *_Nullable heading, NSError *_Nullable error);
 /*!
  * @brief This block gets called when entering or exiting a new region.
  * @param region A CLRegion oject representing the region that was just entered or exited.
@@ -106,6 +118,8 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
  * @discussion The basic value choices are 'none', 'standard' and 'significant'. A value of 'significant' indicates significant change location monitoring is happening and therefore acquired locations will be scrutinized less strenuously than for standard location updates.
  */
 @property (nonatomic, assign) GWMLocationUpdateMode updateMode;
+
+@property (nonatomic, assign) GWMLocationUpdateStyle updateStyle;
 
 ///@brief The current minimum accuracy of locations acquired by the device.
 @property (nonatomic) CLLocationAccuracy desiredAccuracy;
@@ -143,11 +157,17 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 
 #pragma mark - Getting Locations
 
--(void)singleLocationWithCompletion:(GWMSingleLocationCompletionBlock)completionHandler;
--(void)multipleLocationsWithCompletion:(GWMMultipleLocationsCompletionBlock)completionHandler;
+-(void)requestLocationWithCompletion:(GWMLocationCompletionBlock)completionHandler;
+-(void)requestLocationsWithBlock:(GWMLocationsUpdateBlock)locationUpdateHandler;
+
+-(void)requestHeadingsWithBlock:(GWMHeadingUpdateBlock)headingUpdateHandler;
 
 #pragma mark -
-
+/*!
+ * @brief Start receiving standard location updates.
+ * @param accuracy The desired accuracy.
+ * @param distance The desired distance filter.
+ */
 -(void)startStandardLocationUpdatesWithAccuracy:(CLLocationAccuracy)accuracy distance:(CLLocationDistance)distance;
 
 ///@brief Start receiving location updates.
@@ -159,12 +179,11 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 -(void)startSignificantChangeLocationUpdates;
 ///@brief Stop receiving significant location updates.
 -(void)stopSignificantChangeLocationUpdates;
-
 /*!
  * @brief Start monitoring the specified region.
  * @param region The CLRegion to monitor.
  */
--(void)startMonitoringForRegion:(CLRegion *)region completion:(GWMRegionChangeCompletionBlock)completion;
+-(void)startMonitoringForRegion:(CLRegion *)region withBlock:(GWMRegionChangeCompletionBlock)regionUpdateHandler;
 /*!
  * @brief Stop monitoring the specified region.
  * @param region The CLRegion to stop monitoring.
@@ -172,6 +191,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 -(void)stopMonitoringForRegion:(CLRegion *)region;
 
 -(void)stopMonitoringAllRegions;
+///@brief Convenience method for stopping all Location Services.
 -(void)stopAllLocationServices;
 
 ///@brief Start receiving heading updates.

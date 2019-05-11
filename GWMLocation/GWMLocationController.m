@@ -39,10 +39,12 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 @interface GWMLocationController ()
 
 @property (nonatomic, strong) CLLocation *_Nullable location;
+@property (nonatomic, strong) CLHeading *_Nullable heading;
 
-@property (nonatomic, strong) GWMSingleLocationCompletionBlock _Nullable singleLocationCompletion;
-@property (nonatomic, strong) GWMMultipleLocationsCompletionBlock _Nullable multipleLocationsCompletion;
-@property (nonatomic, readonly) NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_Nullable regionChangeCompletionInfo;
+@property (nonatomic, strong) GWMLocationCompletionBlock _Nullable locationCompletionHandler;
+@property (nonatomic, strong) GWMLocationsUpdateBlock _Nullable locationsUpdateHandler;
+@property (nonatomic, strong) GWMHeadingUpdateBlock _Nullable headingUpdateHandler;
+@property (nonatomic, readonly) NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> *_Nullable regionUpdateHandlerInfo;
 
 @end
 
@@ -77,7 +79,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     return self;
 }
 
--(NSMutableDictionary *)regionChangeCompletionInfo
+-(NSMutableDictionary *)regionUpdateHandlerInfo
 {
     if(!_regionChangeCompletionInfo)
         _regionChangeCompletionInfo = [NSMutableDictionary<NSString*,GWMRegionChangeCompletionBlock> new];
@@ -131,24 +133,6 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     self.manager.distanceFilter = distanceFilter;
 }
 
-#pragma mark - Getting Locations
-
--(void)singleLocationWithCompletion:(GWMSingleLocationCompletionBlock)completionHandler
-{
-    self.multipleLocationsCompletion = nil;
-    self.singleLocationCompletion = completionHandler;
-    
-    [self startStandardLocationUpdates];
-}
-
--(void)multipleLocationsWithCompletion:(GWMMultipleLocationsCompletionBlock)completionHandler
-{
-    self.singleLocationCompletion = nil;
-    self.multipleLocationsCompletion = completionHandler;
-    
-    [self startStandardLocationUpdates];
-}
-
 #pragma mark - Testing Locations
 
 -(BOOL)locationPassesTest:(CLLocation *)location
@@ -197,14 +181,24 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
                 
                 if ([self locationPassesTest:location]){
                     self.location = location;
-                    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopStandardLocationUpdates) object:nil];
-                    [self stopStandardLocationUpdates];
                     
-                    if(self.singleLocationCompletion)
-                        self.singleLocationCompletion(self.location, nil);
-                    
-                    if(self.multipleLocationsCompletion)
-                        self.multipleLocationsCompletion(locations, nil);
+                    switch (self.updateStyle) {
+                        case GWMLocationUpdateStyleSingle:{
+                            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopStandardLocationUpdates) object:nil];
+                            [self stopStandardLocationUpdates];
+                            
+                            if(self.locationCompletionHandler)
+                                self.locationCompletionHandler(self.location, nil);
+                            self.locationCompletionHandler = nil;
+                            break;
+                        }
+                        case GWMLocationUpdateStyleMultiple:{
+                            if(self.locationsUpdateHandler)
+                                self.locationsUpdateHandler(locations, nil);
+                        }
+                        default:
+                            break;
+                    }
                     
                     NSDictionary *userInfo = @{GWMLocationControllerCurrentLocation: self.location};
                     
@@ -224,6 +218,10 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
 {
+    self.heading = newHeading;
+    if(self.headingUpdateHandler)
+        self.headingUpdateHandler(self.heading, nil);
+    
     NSDictionary *userInfo = @{GWMLocationControllerCurrentHeading: newHeading};
     
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidUpdateHeadingNotification object:self userInfo:userInfo];
@@ -237,12 +235,23 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 {
     switch (error.code) {
         case kCLErrorDenied:
-            [self stopAllLocationServices];
-            break;
+        case kCLErrorLocationUnknown:{
             
-        case kCLErrorLocationUnknown:
-        case kCLErrorHeadingFailure:
+            if (error.code == kCLErrorDenied)
+                [self stopAllLocationServices];
+            
+            if(self.locationCompletionHandler)
+                self.locationCompletionHandler(nil, error);
+            
+            if(self.locationsUpdateHandler)
+                self.locationsUpdateHandler(nil, error);
             break;
+        }
+        case kCLErrorHeadingFailure:{
+            if(self.headingUpdateHandler)
+                self.headingUpdateHandler(nil, error);
+            break;
+        }
         default:
             break;
     }
@@ -251,11 +260,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidFailWithErrorNotification object:self userInfo:userInfo];
     
-    if(self.singleLocationCompletion)
-        self.singleLocationCompletion(nil, error);
     
-    if(self.multipleLocationsCompletion)
-        self.multipleLocationsCompletion(nil, error);
 }
 
 #pragma mark Paused
@@ -272,19 +277,19 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark Region Monitoring
 
--(void)startMonitoringForRegion:(CLRegion *)region completion:(nonnull GWMRegionChangeCompletionBlock)completion
+-(void)startMonitoringForRegion:(CLRegion *)region withBlock:(nonnull GWMRegionChangeCompletionBlock)completion
 {
     if (self.authorizationStatus != kCLAuthorizationStatusAuthorizedAlways)
         [self.manager requestAlwaysAuthorization];
     
-    self.regionChangeCompletionInfo[region.identifier] = completion;
+    self.regionUpdateHandlerInfo[region.identifier] = completion;
     [self.manager startMonitoringForRegion:region];
 }
 
 -(void)stopMonitoringForRegion:(CLRegion *)region
 {
     [self.manager stopMonitoringForRegion:region];
-    self.regionChangeCompletionInfo[region.identifier] = nil;
+    self.regionUpdateHandlerInfo[region.identifier] = nil;
 }
 
 -(void)stopMonitoringAllRegions
@@ -301,21 +306,21 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region
 {
-    GWMRegionChangeCompletionBlock completion = self.regionChangeCompletionInfo[region.identifier];
+    GWMRegionChangeCompletionBlock completion = self.regionUpdateHandlerInfo[region.identifier];
     if(completion)
         completion(GWMRegionEntered, region, nil);
 }
 
 -(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
 {
-    GWMRegionChangeCompletionBlock completion = self.regionChangeCompletionInfo[region.identifier];
+    GWMRegionChangeCompletionBlock completion = self.regionUpdateHandlerInfo[region.identifier];
     if(completion)
         completion(GWMRegionExited, region, nil);
 }
 
 -(void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region withError:(NSError *)error
 {
-    GWMRegionChangeCompletionBlock completion = self.regionChangeCompletionInfo[region.identifier];
+    GWMRegionChangeCompletionBlock completion = self.regionUpdateHandlerInfo[region.identifier];
     if(completion)
         completion(GWMRegionError, region, error);
 }
@@ -363,10 +368,10 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 //    return self.locationManager.location;
 //}
 
--(CLHeading *)heading
-{
-    return self.manager.heading;
-}
+//-(CLHeading *)heading
+//{
+//    return self.manager.heading;
+//}
 
 #pragma mark - Testing Location Services availability
 
@@ -422,6 +427,24 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 #pragma mark - Starting and stopping location updates
 
+-(void)requestLocationWithCompletion:(GWMLocationCompletionBlock)completionHandler
+{
+    self.updateStyle = GWMLocationUpdateStyleSingle;
+    self.locationsUpdateHandler = nil;
+    self.locationCompletionHandler = completionHandler;
+    
+    [self startStandardLocationUpdates];
+}
+
+-(void)requestLocationsWithBlock:(GWMLocationsUpdateBlock)completionHandler
+{
+    self.updateStyle = GWMLocationUpdateStyleMultiple;
+    self.locationCompletionHandler = nil;
+    self.locationsUpdateHandler = completionHandler;
+    
+    [self startStandardLocationUpdates];
+}
+
 -(void)startStandardLocationUpdatesWithAccuracy:(CLLocationAccuracy)accuracy distance:(CLLocationDistance)distance
 {
     if (!self.locationServicesAvailable)
@@ -461,6 +484,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 -(void)stopStandardLocationUpdates
 {
     self.updateMode = GWMLocationUpdateModeNone;
+    self.updateStyle = GWMLocationUpdateStyleNone;
     [self.manager stopUpdatingLocation];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopUpdatingLocationsNotification object:self];
     
@@ -485,6 +509,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 -(void)stopSignificantChangeLocationUpdates
 {
     self.updateMode = GWMLocationUpdateModeNone;
+    self.updateStyle = GWMLocationUpdateStyleNone;
     [self.manager stopMonitoringSignificantLocationChanges];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification object:self];
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStopMonitoringSignificantLocationChangesNotification);
@@ -495,9 +520,16 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     [self stopUpdatingHeading];
     [self stopStandardLocationUpdates];
     [self stopSignificantChangeLocationUpdates];
+    [self stopMonitoringAllRegions];
 }
 
 #pragma mark - Starting and stopping heading updates
+
+-(void)requestHeadingsWithBlock:(GWMHeadingUpdateBlock)headingUpdateHandler
+{
+    self.headingUpdateHandler = headingUpdateHandler;
+    [self startUpdatingHeading];
+}
 
 -(void)startUpdatingHeading
 {
@@ -511,6 +543,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 
 -(void)stopUpdatingHeading
 {
+    self.headingUpdateHandler = nil;
     [self.manager stopUpdatingHeading];
     [[NSNotificationCenter defaultCenter] postNotificationName:GWMLocationControllerDidStopUpdatingHeadingNotification object:self];
 //    NSLog(@"Notification Posted: %@", GWMLocationControllerDidStopUpdatingHeadingNotification);
