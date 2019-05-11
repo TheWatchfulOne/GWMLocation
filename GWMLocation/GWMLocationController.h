@@ -131,7 +131,8 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 
 ///@brief The current permission granted for acquiring locations.
 @property (nonatomic, readonly) CLAuthorizationStatus authorizationStatus;
-
+///@brief The current regions being monitored.
+@property (nonatomic, readonly) NSSet<__kindof CLRegion*> *monitoredRegions;
 ///@brief The shared GWMLocationController instance.
 +(instancetype)sharedController;
 
@@ -170,7 +171,7 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
  */
 -(void)stopMonitoringForRegion:(CLRegion *)region;
 
--(void)stopMonitorigAllRegions;
+-(void)stopMonitoringAllRegions;
 -(void)stopAllLocationServices;
 
 ///@brief Start receiving heading updates.

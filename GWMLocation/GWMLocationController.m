@@ -287,9 +287,9 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     self.regionChangeCompletionInfo[region.identifier] = nil;
 }
 
--(void)stopMonitorigAllRegions
+-(void)stopMonitoringAllRegions
 {
-    [self.manager.monitoredRegions enumerateObjectsUsingBlock:^(__kindof CLRegion *_Nonnull reg, BOOL *stop){
+    [self.monitoredRegions enumerateObjectsUsingBlock:^(__kindof CLRegion *_Nonnull reg, BOOL *stop){
         [self stopMonitoringForRegion:reg];
     }];
 }
@@ -333,7 +333,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
         case kCLAuthorizationStatusAuthorizedWhenInUse:
         {
             [self stopSignificantChangeLocationUpdates];
-            [self stopMonitorigAllRegions];
+            [self stopMonitoringAllRegions];
             break;
         }
         case kCLAuthorizationStatusDenied:
@@ -342,7 +342,7 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
         {
             [self stopStandardLocationUpdates];
             [self stopSignificantChangeLocationUpdates];
-            [self stopMonitorigAllRegions];
+            [self stopMonitoringAllRegions];
             break;
         }
         default:
@@ -411,6 +411,13 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
 -(BOOL)headingAvailable
 {
     return [CLLocationManager headingAvailable];
+}
+
+#pragma mark - Regions
+
+-(NSSet<CLRegion*>*)monitoredRegions
+{
+    return self.manager.monitoredRegions;
 }
 
 #pragma mark - Starting and stopping location updates
