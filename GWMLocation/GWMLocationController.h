@@ -145,6 +145,8 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 
 ///@brief The current permission granted for acquiring locations.
 @property (nonatomic, readonly) CLAuthorizationStatus authorizationStatus;
+
+@property (nonatomic, readonly) BOOL isAuthorized;
 ///@brief The current regions being monitored.
 @property (nonatomic, readonly) NSSet<__kindof CLRegion*> *monitoredRegions;
 ///@brief The shared GWMLocationController instance.

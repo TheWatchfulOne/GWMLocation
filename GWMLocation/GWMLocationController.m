@@ -385,6 +385,11 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     return [CLLocationManager authorizationStatus];
 }
 
+-(BOOL)isAuthorized
+{
+    return (self.authorizationStatus == kCLAuthorizationStatusAuthorizedAlways || self.authorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse);
+}
+
 -(BOOL)locationServicesAvailable
 {
     if (![CLLocationManager locationServicesEnabled])
