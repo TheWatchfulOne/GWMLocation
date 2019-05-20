@@ -154,7 +154,9 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 
 #pragma mark - Authorization
 
+///@brief Request authorization to use Location Services while app is in use.
 -(void)requestAuthorization;
+///@brief Request authorization to always use Location Services.
 -(void)requestAlwaysAuthorization;
 
 #pragma mark - Getting Locations
