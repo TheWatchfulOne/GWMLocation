@@ -125,6 +125,8 @@ typedef void (^GWMRegionChangeCompletionBlock)(GWMRegionChange change, CLRegion 
 @property (nonatomic) CLLocationAccuracy desiredAccuracy;
 ///@brief The minimum distance the device needs to move before a new location event is triggered.
 @property (nonatomic) CLLocationDistance distanceFilter;
+///@brief The current activity type
+@property (nonatomic) CLActivityType activityType;
 /*!
  * @brief Tells whether Location Services are available on the device.
  * @discussion This is affected by the capabilities of the device as well as the authorization status.

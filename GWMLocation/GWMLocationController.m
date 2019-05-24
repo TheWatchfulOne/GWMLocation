@@ -133,6 +133,18 @@ NSTimeInterval const kGWMMaximumUsableLocationAge = 5.0;
     self.manager.distanceFilter = distanceFilter;
 }
 
+#pragma mark - Activity Type
+
+-(CLActivityType)activityType
+{
+    return self.manager.activityType;
+}
+
+-(void)setActivityType:(CLActivityType)activityType
+{
+    self.manager.activityType = activityType;
+}
+
 #pragma mark - Testing Locations
 
 -(BOOL)locationPassesTest:(CLLocation *)location
