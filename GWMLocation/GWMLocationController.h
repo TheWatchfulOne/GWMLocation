@@ -75,7 +75,7 @@ extern NSString * const GWMLocationControllerAuthorizationStatus;
 ///@brief Used to retrieve an NSError object from an NSNotification's userInfo dictionary.
 extern NSString * const GWMLocationControllerError;
 
-///@brief An NSArray containing the query results.
+///@brief The maximum allowable age of a location. Value is 5.0.
 extern NSTimeInterval const kGWMMaximumUsableLocationAge;
 /*!
  * @brief This block gets called when a new location is acquired.
@@ -96,7 +96,7 @@ typedef void (^GWMLocationsUpdateBlock)(NSArray<CLLocation*> *_Nullable location
  */
 typedef void (^GWMHeadingUpdateBlock)(CLHeading *_Nullable heading, NSError *_Nullable error);
 /*!
- * @brief This block gets called when entering or exiting a new region.
+ * @brief This block gets called when entering or exiting a monitored region.
  * @param region A CLRegion oject representing the region that was just entered or exited.
  * @param change A GWMRegionChange value indicating whether the region was entered or exited.
  * @param error A NSError object.
